@@ -1,0 +1,59 @@
+version: '3.5'
+
+services:
+  app:
+    image: 'app:${GIT7_HASH}'
+    build:
+      context: .
+    environment:
+      - GIT7_HASH
+      - NODE_ENV
+      - PORT
+      - JWT_SECRET_KEY
+      - MONGODB_URI
+      - FULL_HOST
+      - MASTER_AUCTION_CONTRACT_ADDRESS
+      - JUST_FAN_COLLECTION_CONTRACT_ADDRESS
+      - JUST_FAN_CONTRACT_DEPLOYER_ACCOUNT_PRIVATEKEY
+      - PINATA_API_KEY
+      - PINATA_SECRET_API_KEY
+    ports:
+      - '8000:8000'
+    command: npm run start
+
+  collection_event_listener:
+    image: 'collection_events_listener:${GIT7_HASH}'
+    build:
+      context: .
+    environment:
+      - NODE_ENV
+      - PORT
+      - JWT_SECRET_KEY
+      - MONGODB_URI
+      - FULL_HOST
+      - MASTER_AUCTION_CONTRACT_ADDRESS
+      - JUST_FAN_COLLECTION_CONTRACT_ADDRESS
+      - JUST_FAN_CONTRACT_DEPLOYER_ACCOUNT_PRIVATEKEY
+      - PINATA_API_KEY
+      - PINATA_SECRET_API_KEY
+    command: node cron-jobs/getJustFanCollectionEvents.js
+
+  auction_event_listener:
+    image: 'auction_events_listener:${GIT7_HASH}'
+    build:
+      context: .
+    environment:
+      - GIT7_HASH
+      - NODE_ENV
+      - PORT
+      - JWT_SECRET_KEY
+      - MONGODB_URI
+      - FULL_HOST
+      - MASTER_AUCTION_CONTRACT_ADDRESS
+      - JUST_FAN_COLLECTION_CONTRACT_ADDRESS
+      - JUST_FAN_CONTRACT_DEPLOYER_ACCOUNT_PRIVATEKEY
+      - PINATA_API_KEY
+      - PINATA_SECRET_API_KEY
+      - PROD_MONGODB_URI
+      - DEV_MONGODB_URI
+    command: node cron-jobs/getAuctionEngineEvents.js
